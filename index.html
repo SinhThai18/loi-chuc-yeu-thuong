@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Lời chúc yêu thương</title>
+</head>
+<body>
+  <h2>Gửi lời chúc</h2>
+  <form id="messageForm">
+    <label>Người gửi: </label>
+    <input type="text" id="senderName"><br>
+    <input type="checkbox" id="anonymous"> Gửi ẩn danh<br><br>
+
+    <label>Người nhận: </label>
+    <input type="text" id="receiverName"><br><br>
+
+    <label>Lời nhắn: </label><br>
+    <textarea id="messageText"></textarea><br><br>
+
+    <label>File âm thanh/video:</label>
+    <input type="file" id="mediaFile"><br><br>
+
+    <button type="submit">Gửi lời chúc</button>
+  </form>
+
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+  <script>
+    // ✅ Firebase Config
+    const firebaseConfig = {
+  apiKey: "AIzaSyCR6ChodbxTFeMqVEfc37LGMZn0sRKyl-k",
+  authDomain: "loichucyeuthuong18.firebaseapp.com",
+  projectId: "loichucyeuthuong18",
+  storageBucket: "loichucyeuthuong18.firebasestorage.app",
+  messagingSenderId: "434140825017",
+  appId: "1:434140825017:web:13deda5e05e22fe2f76268"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    document.getElementById("messageForm").addEventListener("submit", async function(e) {
+      e.preventDefault();
+
+      let sender = document.getElementById("anonymous").checked ? "Ẩn danh" : document.getElementById("senderName").value;
+      let receiver = document.getElementById("receiverName").value;
+      let message = document.getElementById("messageText").value;
+      let file = document.getElementById("mediaFile").files[0];
+
+      let fileUrl = "";
+      if (file) {
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("upload_preset", "demo_unsigned");
+
+        const res = await fetch("https://api.cloudinary.com/v1_1/dddplwb0o/video/upload", {
+          method: "POST",
+          body: formData
+        });
+        const data = await res.json();
+        fileUrl = data.secure_url;
+      }
+
+      const newMsgRef = db.ref("messages").push();
+      newMsgRef.set({
+        sender,
+        receiver,
+        message,
+        fileUrl,
+        timestamp: new Date().toISOString()
+      });
+
+      alert("Đã gửi lời chúc!");
+      document.getElementById("messageForm").reset();
+    });
+  </script>
+</body>
+</html>

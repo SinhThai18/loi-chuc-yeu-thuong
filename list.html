@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+     <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <h2>Danh sách lời chúc</h2>
+  <ul id="messageList"></ul>
+
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+  <script>
+    const firebaseConfig = {
+  apiKey: "AIzaSyCR6ChodbxTFeMqVEfc37LGMZn0sRKyl-k",
+  authDomain: "loichucyeuthuong18.firebaseapp.com",
+  projectId: "loichucyeuthuong18",
+  storageBucket: "loichucyeuthuong18.firebasestorage.app",
+  messagingSenderId: "434140825017",
+  appId: "1:434140825017:web:13deda5e05e22fe2f76268"
+     };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    const messageList = document.getElementById("messageList");
+    db.ref("messages").on("value", snapshot => {
+      messageList.innerHTML = "";
+      snapshot.forEach(child => {
+        const data = child.val();
+        const li = document.createElement("li");
+        li.innerHTML = `<b>${data.sender}</b> gửi cho <b>${data.receiver}</b>: ${data.message}
+          ${data.fileUrl ? `<br><a href="${data.fileUrl}" target="_blank">Xem file</a>` : ""}
+          <hr>`;
+        messageList.appendChild(li);
+      });
+    });
+  </script>
+</body>
+
+</html>
