@@ -26,14 +26,8 @@
     <label for="storyText">Câu chuyện bạn muốn chia sẻ cho chúng tôi:</label>
     <textarea id="storyText" rows="4" placeholder="(Không bắt buộc) Chia sẻ thêm về hoàn cảnh, ý nghĩa lời chúc..."></textarea>
 
-    <label>📸 Chụp ảnh hoặc quay video:</label>
-   <input type="file" accept="image/*,video/*" capture>
-
-    <label>🎤 Ghi âm lời chúc:</label>
-     <input type="file" accept="audio/*" capture>
-
     <label for="mediaFile">File âm thanh / video / hình ảnh:</label>
-    <input type="file" id="mediaFile" accept="audio/*,video/*,image/*" multiple >
+    <input type="file" id="mediaFile" accept="audio/*,video/*,image/*" multiple capture>
     <div id="fileList"></div>
 
     <button type="submit" id="sendBtn">🎁 Gửi lời chúc</button>
