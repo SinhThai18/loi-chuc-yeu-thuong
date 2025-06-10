@@ -1,3 +1,10 @@
+ * {
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+}
  body {
       font-family: 'Quicksand', sans-serif;
       background: linear-gradient(to right, #ffe3e3, #fff0f5);
@@ -7,6 +14,7 @@
       justify-content: center;
       align-items: center;
       min-height: 100vh;
+       overflow-y: auto;
     }
 
     form {
@@ -201,14 +209,42 @@
     border-radius: 10px;
     transition: width 0.4s ease;
   }
-    @media (max-width: 500px) {
-      form {
-        padding: 20px;
-      }
+   @media (max-width: 500px) {
+  body {
+    padding: 10px;
+  }
 
-      button {
-        font-size: 14px;
-      }
-    }
-  
+  form {
+    padding: 20px 15px;
+    border-radius: 12px;
+  }
+
+  input[type="text"],
+  textarea,
+  input[type="file"] {
+    font-size: 15px;
+  }
+
+  button {
+    font-size: 15px;
+    padding: 10px;
+     touch-action: manipulation;
+  }
+
+  .modal-content {
+    width: 90%;
+    max-width: 95%;
+    padding: 20px;
+  }
+
+   .file-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .file-item button {
+    align-self: flex-end;
+    margin-top: 5px;
+  }
+}
 

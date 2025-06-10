@@ -2,13 +2,14 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
-  <title>Lời chúc yêu thương</title>
+  <title>Lời yêu thương</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600&display=swap">
   <link rel="stylesheet" href="styles.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
   <form id="messageForm">
-    <h2>💌 Gửi lời chúc yêu thương</h2>
+    <h2>💌 Gửi lời nhắn </h2>
 
     <label for="senderName">Người gửi:</label>
     <input type="text" id="senderName" class="animation" placeholder="Tên bạn (hoặc để trống nếu ẩn danh)">
@@ -21,7 +22,7 @@
     <input type="text" id="receiverContact" class="animation" required placeholder="VD: facebook.com/nguoinhan">
 
     <label for="messageText">Lời nhắn:</label>
-    <textarea id="messageText" required placeholder="Viết lời chúc của bạn tại đây..."></textarea>
+    <textarea id="messageText" required placeholder="Viết lời nhắn của bạn tại đây..."></textarea>
 
     <label for="storyText">Câu chuyện bạn muốn chia sẻ cho chúng tôi:</label>
     <textarea id="storyText" rows="4" placeholder="(Không bắt buộc) Chia sẻ thêm về hoàn cảnh, ý nghĩa lời chúc..."></textarea>
@@ -30,9 +31,9 @@
     <input type="file" id="mediaFile" accept="audio/*,video/*,image/*" multiple capture>
     <div id="fileList"></div>
 
-    <button type="submit" id="sendBtn">🎁 Gửi lời chúc</button>
+    <button type="submit" id="sendBtn">🎁 Gửi lời nhắn </button>
     <div id="progressContainer">
-  <div id="progressText">🎁 Đang gửi lời chúc...</div>
+  <div id="progressText">🎁 Đang gửi lời nhắn ...</div>
   <progress id="progressBar" value="0" max="100"></progress>
 </div>
     <p class="error" id="errorMsg"></p>
@@ -41,8 +42,8 @@
   <!-- Modal gửi thành công -->
   <div class="modal" id="successModal">
     <div class="modal-content">
-      <h3>🎉 Gửi lời chúc thành công!</h3>
-      <p>Lời chúc của bạn sẽ đến đích trong 24h💖</p>
+      <h3>🎉 Gửi lời nhắn thành công!</h3>
+      <p>Lời nhắn của bạn sẽ đến đích trong 24h💖</p>
       <button onclick="closeModal()">Đóng</button>
     </div>
   </div>
