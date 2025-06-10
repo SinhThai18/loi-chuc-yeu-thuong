@@ -64,6 +64,31 @@
       color: #666;
       margin-top: 8px;
     }
+    .contact-link {
+  display: inline-block;
+  word-break: break-all;
+  max-width: 100%;
+  color: #333;
+  font-weight: 500;
+}
+
+button {
+  margin: 5px 5px 5px 0;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 8px;
+  background-color: #ffb3d1;
+  color: #000;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+button:hover {
+  background-color: #ff80bf;
+  transform: scale(1.05);
+}
+
+
     @media (max-width: 600px) {
       button {
         width: 100%;
@@ -131,7 +156,9 @@
 
         li.innerHTML = `
           <b>STT ${count}:</b> <b>${data.sender}</b> gửi đến <b>${data.receiver}</b><br>
-          <i>Liên hệ:</i> ${data.contact}<br><br>
+          <i>Liên hệ:</i> <span class="contact-link">${data.contact}</span>
+          <button onclick="copyToClipboard('${data.contact}', this)">📋 Copy</button><br><br>
+
           <button onclick="showMessage(this, \`${escapeHtml(data.message)}\`)">📨 Xem lời nhắn</button>
           ${fileButtonsHTML}
           <div class="media-container"></div>
@@ -229,6 +256,28 @@ if (type === "video" || type === "audio" || media.tagName === "IMG") {
                  .replace(/'/g, "&#039;")
                  .replace(/\n/g, "\\n");
     }
+   
+    function copyToClipboard(text, button) {
+  navigator.clipboard.writeText(text).then(() => {
+    // Thay đổi màu và nội dung nút
+    const originalText = button.textContent;
+    button.textContent = "✅ Đã sao chép";
+    button.style.backgroundColor = "#d63384";
+    button.style.color = "white";
+    button.style.transition = "all 0.3s ease";
+
+    // Trở lại bình thường sau 2 giây
+    setTimeout(() => {
+      button.textContent = originalText;
+      button.style.backgroundColor = "#ffb3d1";
+      button.style.color = "#000";
+    }, 2000);
+  }).catch(err => {
+    console.error(err);
+  });
+}
+
+
   </script>
 </body>
 </html>
