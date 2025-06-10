@@ -1,76 +1,196 @@
 <!DOCTYPE html>
-<html>
+<html lang="vi">
 <head>
+  <meta charset="UTF-8">
   <title>Lời chúc yêu thương</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600&display=swap">
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <h2>Gửi lời chúc</h2>
   <form id="messageForm">
-    <label>Người gửi: </label>
-    <input type="text" id="senderName"><br>
-    <input type="checkbox" id="anonymous"> Gửi ẩn danh<br><br>
+    <h2>💌 Gửi lời chúc yêu thương</h2>
 
-    <label>Người nhận: </label>
-    <input type="text" id="receiverName"><br><br>
+    <label for="senderName">Người gửi:</label>
+    <input type="text" id="senderName" class="animation" placeholder="Tên bạn (hoặc để trống nếu ẩn danh)">
+    <label><input type="checkbox" id="anonymous"> Gửi ẩn danh</label>
 
-    <label>Lời nhắn: </label><br>
-    <textarea id="messageText"></textarea><br><br>
+    <label for="receiverName">Người nhận:</label>
+    <input type="text" id="receiverName" class="animation" required placeholder="Tên người nhận">
 
-    <label>File âm thanh/video:</label>
-    <input type="file" id="mediaFile"><br><br>
+    <label for="receiverContact">Liên hệ (SĐT, Facebook, Zalo...):</label>
+    <input type="text" id="receiverContact" class="animation" required placeholder="VD: facebook.com/nguoinhan">
 
-    <button type="submit">Gửi lời chúc</button>
+    <label for="messageText">Lời nhắn:</label>
+    <textarea id="messageText" required placeholder="Viết lời chúc của bạn tại đây..."></textarea>
+
+    <label for="storyText">Câu chuyện bạn muốn chia sẻ cho chúng tôi:</label>
+    <textarea id="storyText" rows="4" placeholder="(Không bắt buộc) Chia sẻ thêm về hoàn cảnh, ý nghĩa lời chúc..."></textarea>
+
+    <label>📸 Chụp ảnh hoặc quay video:</label>
+   <input type="file" accept="image/*,video/*" capture>
+
+    <label>🎤 Ghi âm lời chúc:</label>
+     <input type="file" accept="audio/*" capture>
+
+    <label for="mediaFile">File âm thanh / video / hình ảnh:</label>
+    <input type="file" id="mediaFile" accept="audio/*,video/*,image/*" multiple >
+    <div id="fileList"></div>
+
+    <button type="submit" id="sendBtn">🎁 Gửi lời chúc</button>
+    <div id="progressContainer">
+  <div id="progressText">🎁 Đang gửi lời chúc...</div>
+  <progress id="progressBar" value="0" max="100"></progress>
+</div>
+    <p class="error" id="errorMsg"></p>
   </form>
 
+  <!-- Modal gửi thành công -->
+  <div class="modal" id="successModal">
+    <div class="modal-content">
+      <h3>🎉 Gửi lời chúc thành công!</h3>
+      <p>Lời chúc của bạn sẽ đến đích trong 24h💖</p>
+      <button onclick="closeModal()">Đóng</button>
+    </div>
+  </div>
+
+  <!-- Firebase Scripts -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
   <script>
-    // ✅ Firebase Config
     const firebaseConfig = {
-  apiKey: "AIzaSyCR6ChodbxTFeMqVEfc37LGMZn0sRKyl-k",
-  authDomain: "loichucyeuthuong18.firebaseapp.com",
-  projectId: "loichucyeuthuong18",
-  storageBucket: "loichucyeuthuong18.firebasestorage.app",
-  messagingSenderId: "434140825017",
-  appId: "1:434140825017:web:13deda5e05e22fe2f76268"
+      apiKey: "AIzaSyCR6ChodbxTFeMqVEfc37LGMZn0sRKyl-k",
+      authDomain: "loichucyeuthuong18.firebaseapp.com",
+      projectId: "loichucyeuthuong18",
+      storageBucket: "loichucyeuthuong18.firebasestorage.app",
+      messagingSenderId: "434140825017",
+      appId: "1:434140825017:web:13deda5e05e22fe2f76268"
     };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    document.getElementById("messageForm").addEventListener("submit", async function(e) {
-      e.preventDefault();
+    const form = document.getElementById("messageForm");
+    const sendBtn = document.getElementById("sendBtn");
+    const progressBar = document.getElementById("progressBar");
+    const errorMsg = document.getElementById("errorMsg");
+    const fileInput = document.getElementById("mediaFile");
+    const fileListDiv = document.getElementById("fileList");
+    const successModal = document.getElementById("successModal");
 
-      let sender = document.getElementById("anonymous").checked ? "Ẩn danh" : document.getElementById("senderName").value;
-      let receiver = document.getElementById("receiverName").value;
-      let message = document.getElementById("messageText").value;
-      let file = document.getElementById("mediaFile").files[0];
+    let selectedFiles = [];
 
-      let fileUrl = "";
-      if (file) {
-        const formData = new FormData();
-        formData.append("file", file);
-        formData.append("upload_preset", "demo_unsigned");
+    fileInput.addEventListener("change", () => {
+      const newFiles = Array.from(fileInput.files);
+      selectedFiles = selectedFiles.concat(newFiles);
 
-        const res = await fetch("https://api.cloudinary.com/v1_1/dddplwb0o/video/upload", {
-          method: "POST",
-          body: formData
-        });
-        const data = await res.json();
-        fileUrl = data.secure_url;
-      }
-
-      const newMsgRef = db.ref("messages").push();
-      newMsgRef.set({
-        sender,
-        receiver,
-        message,
-        fileUrl,
-        timestamp: new Date().toISOString()
+      const seen = new Set();
+      selectedFiles = selectedFiles.filter(file => {
+        const key = file.name + file.size;
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
       });
 
-      alert("Đã gửi lời chúc!");
-      document.getElementById("messageForm").reset();
+      const dt = new DataTransfer();
+      selectedFiles.forEach(f => dt.items.add(f));
+      fileInput.files = dt.files;
+
+      updateFileList();
+    });
+
+    function updateFileList() {
+      fileListDiv.innerHTML = "";
+      selectedFiles.forEach((file, index) => {
+        const item = document.createElement("div");
+        item.className = "file-item";
+        item.innerHTML = `
+          <span>${file.name}</span>
+          <button onclick="removeFile(${index})">✖</button>
+        `;
+        fileListDiv.appendChild(item);
+      });
+    }
+
+    function removeFile(index) {
+      selectedFiles.splice(index, 1);
+      const dt = new DataTransfer();
+      selectedFiles.forEach(f => dt.items.add(f));
+      fileInput.files = dt.files;
+      updateFileList();
+    }
+
+    function closeModal() {
+      successModal.style.display = "none";
+    }
+
+    form.addEventListener("submit", async function (e) {
+      e.preventDefault();
+
+      sendBtn.disabled = true;
+      document.getElementById("progressContainer").style.display = "block";
+      progressBar.value = 10;
+      errorMsg.textContent = "";
+
+      const sender = document.getElementById("anonymous").checked ? "Ẩn danh" : document.getElementById("senderName").value.trim();
+      const receiver = document.getElementById("receiverName").value.trim();
+      const contact = document.getElementById("receiverContact").value.trim();
+      const message = document.getElementById("messageText").value.trim();
+      const story = document.getElementById("storyText").value.trim();
+
+      if (!receiver || !message || !contact) {
+        errorMsg.textContent = "Vui lòng điền đầy đủ thông tin bắt buộc.";
+        sendBtn.disabled = false;
+        document.getElementById("progressContainer").style.display = "none";
+
+        return;
+      }
+
+      try {
+        const uploadedUrls = [];
+        let uploadedCount = 0;
+
+        for (const file of selectedFiles) {
+          const formData = new FormData();
+          formData.append("file", file);
+          formData.append("upload_preset", "demo_unsigned");
+
+          const res = await fetch("https://api.cloudinary.com/v1_1/dddplwb0o/auto/upload", {
+            method: "POST",
+            body: formData
+          });
+
+          const data = await res.json();
+          if (!data.secure_url) throw new Error("Tải file lên thất bại.");
+          uploadedUrls.push(data.secure_url);
+
+          uploadedCount++;
+          progressBar.value = 10 + Math.floor((uploadedCount / selectedFiles.length) * 80); // up to 90%
+        }
+
+        const newMsgRef = db.ref("messages").push();
+        await newMsgRef.set({
+          sender,
+          receiver,
+          contact,
+          message,
+           story,
+          files: uploadedUrls,
+          timestamp: new Date().toISOString()
+        });
+
+        progressBar.value = 100;
+
+        form.reset();
+        fileListDiv.innerHTML = "";
+        selectedFiles = [];
+        successModal.style.display = "flex";
+      } catch (error) {
+        console.error(error);
+        errorMsg.textContent = "Đã có lỗi xảy ra. Vui lòng thử lại.";
+      }
+
+      sendBtn.disabled = false;
+      setTimeout(() => progressBar.style.display = "none", 500);
     });
   </script>
 </body>
