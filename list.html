@@ -179,6 +179,31 @@
       media.style.display = "block";
       media.style.marginTop = "10px";
       container.appendChild(media);
+
+// Thêm nút tải xuống nếu không phải là thẻ <a> (vì <a> đã là link tải)
+if (type === "video" || type === "audio" || media.tagName === "IMG") {
+  const downloadBtn = document.createElement("button");
+  downloadBtn.textContent = "⬇️ Tải xuống";
+  downloadBtn.onclick = async () => {
+    try {
+      const response = await fetch(url);
+      const blob = await response.blob();
+      const blobUrl = URL.createObjectURL(blob);
+
+      const a = document.createElement("a");
+      a.href = blobUrl;
+      a.download = `file-${Date.now()}`;
+      a.click();
+      URL.revokeObjectURL(blobUrl);
+    } catch (err) {
+      alert("❌ Không thể tải file.");
+      console.error(err);
+    }
+  };
+  container.appendChild(downloadBtn);
+}
+
+
     }
 
     function showMessage(button, msg) {

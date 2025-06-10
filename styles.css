@@ -209,6 +209,32 @@ html, body {
     border-radius: 10px;
     transition: width 0.4s ease;
   }
+
+  .logo-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 20px;
+  justify-content: center;
+}
+
+.logo-img {
+  height: 100px;
+  width: auto;
+   transition: transform 0.3s ease;
+}
+
+.logo-title {
+  font-family: 'Quicksand', sans-serif;
+  font-size: 24px;
+  font-weight: 600;
+  color: #333;
+}
+
+.logo-img:hover {
+  transform: scale(1.05);
+}
+
    @media (max-width: 500px) {
   body {
     padding: 10px;
